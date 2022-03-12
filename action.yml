@@ -5,18 +5,30 @@ branding:
   icon: "download"
   color: blue
 inputs:
-  param-id: # param id
+  version:
+    description: "expected module version"
+    required: false
+    default: "latest"
+  param-id:
     description: "param description"
-    required: true
+    required: false
     default: "World"
+  verbose:
+    description: "verbose output"
+    required: false
+    default: "true"
 outputs:
-  random-number: # output value id
+  output-id:
     description: "Random number"
-    value: ${{ steps.main.outputs.output-param-id }}
+    value: ${{ steps.main.outputs.output-id }}
 runs:
   using: "composite"
   steps:
     - id: main
       shell: powershell
       run: |
-          . "${{ github.action_path }}/Invoke-GitHubAction.ps1";
+        . "${{ github.action_path }}/Invoke-GitHubAction.ps1" `
+          -ParamId "${{ inputs.param-id }}" `
+          -Version "${{ inputs.version }}" `
+          -Verbose:( "${{ inputs.verbose }}" -eq "true" ) `
+        ;

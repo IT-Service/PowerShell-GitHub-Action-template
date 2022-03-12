@@ -1,4 +1,26 @@
-#!/usr/bin/env pwsh
+# Copyright © 2022 Sergei S. Betke
+
+<#
+	.SYNOPSIS
+		Create ReleaseNotes.md from ChangeLog.md
+#>
+
+[CmdletBinding()]
+
+Param(
+
+	# Param description
+	[Parameter( Mandatory = $False )]
+	[System.String]
+	$ParamId = 'World',
+
+	# Expected module version
+	[Parameter( Mandatory = $False )]
+	[System.String]
+	$Version
+
+)
+
 Import-Module $PSScriptRoot/lib/GitHubActionsCore;
 
 try
@@ -18,16 +40,13 @@ try
 	Enter-ActionOutputGroup -Name "Install $ModuleName";
 	try
 	{
-		$installModuleParams = @{ Name = $ModuleName; Force = $true };
-		$VersionParam = ( Get-ActionInput 'version' );
-		if ( $VersionParam -and ( $VersionParam -ne 'latest' ) )
-		{
-			$Version = $VersionParam;
-		};
-
-		if ( $Version )
+		if ( $Version -and ( $Version -ne 'latest' ) )
 		{
 			$installModParams.Add( 'RequiredVersion', $Version );
+		}
+		else
+		{
+			$Version = $null;
 		};
 
 		Write-ActionInfo ( 'checking for {0} module...' -f $ModuleName );
@@ -62,21 +81,11 @@ try
 		Exit-ActionOutputGroup;
 	};
 
-	$params = @{ };
+	Invoke-CmdLet `
+		-ParamId $ParamId  `
+		-Verbose:( $PSCmdlet.MyInvocation.BoundParameters['Verbose'] -eq $true );
 
-	$recurseParam = ( Get-ActionInput -Name 'recurse' );
-	if ( -not ( $recurseParam -and ( $recurseParam -ne 'true' ) ) )
-	{
-		$params.Add( '-Recurse', $true );
-	};
-
-	$verboseParam = ( Get-ActionInput -Name 'verbose' );
-	if ( -not ( $verboseParam -and ( $verboseParam -ne 'true' ) ) )
-	{
-		$params.Add( 'Verbose', $true );
-	};
-
-	Invoke-PSDepend @params -Confirm:$false;
+	Set-ActionOutput -Name 'output-id' -Value $OutputId;
 }
 catch
 {
