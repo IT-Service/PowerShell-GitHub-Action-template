@@ -1,4 +1,4 @@
-name: "{GitHub action name}"
+name: "{repository-name}"
 description: "{GitHub action description}"
 author: "Sergey.S.Betke@yandex.ru"
 branding:
