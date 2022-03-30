@@ -16,7 +16,7 @@ Basic:
 ```yaml
 steps:
 - uses: actions/checkout@v3
-- uses: actions/{repository-name}@v1
+- uses: {repository-owner}/{repository-name}@v1
   with:
     param: 'param value' # comment for param
 ```
